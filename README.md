@@ -85,3 +85,10 @@ const PREVIEW_FAMILY = 'large';
 
 const THEME_OVERRIDE = null;
 // null = follow system | 'light' | 'dark'
+```
+
+---
+
+### License
+
+This project is distributed under the MIT License. See `LICENSE.txt` for the full license text.
