@@ -22,15 +22,19 @@ A clean and modern [Scriptable](https://scriptable.app) widget that shows the re
 
 ### Screenshots
 
-> **Tip:** Replace the placeholder images below with real screenshots of your widget.
+#### Home Screen Widgets
 
-| Small | Medium | Large |
-|:-----:|:------:|:-----:|
-| ![Small](assets/small.png) | ![Medium](assets/medium.png) | ![Large](assets/large.png) |
+| Small | Medium |
+|:-----:|:------:|
+| ![Small Widget](assets/small.jpg) | ![Medium Widget](assets/medium.jpg) |
 
-| Lock Screen – Rectangular | Lock Screen – Circular |
-|:-------------------------:|:----------------------:|
-| ![Rectangular](assets/rectangular.png) | ![Circular](assets/circular.png) |
+**Large Widget**
+
+![Large Widget](assets/large.jpg)
+
+#### Lock Screen
+
+![Lock Screen Widget](assets/lockscreen.jpg)
 
 ---
 
