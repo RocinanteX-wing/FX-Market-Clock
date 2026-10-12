@@ -11,30 +11,43 @@ A clean and modern [Scriptable](https://scriptable.app) widget that shows the re
 ### Features
 
 - Live open/closed status for all four major FX sessions
-- Next open / close countdown
+- Next open / close countdown with precise timing
 - Full 24-hour visual schedule in **your local time**
 - Best liquidity hour, quietest hour, and NY “witching” hour
 - Automatic Light / Dark mode support
-- Correct handling of DST, weekends, and major holidays (Christmas, New Year, Good Friday)
-- Supports Home Screen (Small / Medium / Large) and Lock Screen widgets
+- Correctly handles DST, weekends, and major holidays (Christmas, New Year, Good Friday)
+- Works on both Home Screen and Lock Screen widgets
 
 ---
 
 ### Screenshots
 
-#### Home Screen Widgets
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Small</strong><br>
+      <img src="assets/small.jpg" width="220">
+    </td>
+    <td align="center" width="50%">
+      <strong>Medium</strong><br>
+      <img src="assets/medium.jpg" width="320">
+    </td>
+  </tr>
+</table>
 
-| Small | Medium |
-|:-----:|:------:|
-| ![Small Widget](assets/small.jpg) | ![Medium Widget](assets/medium.jpg) |
+<br>
 
-**Large Widget**
+<p align="center">
+  <strong>Large</strong><br>
+  <img src="assets/large.jpg" width="420">
+</p>
 
-![Large Widget](assets/large.jpg)
+<br>
 
-#### Lock Screen
-
-![Lock Screen Widget](assets/lockscreen.jpg)
+<p align="center">
+  <strong>Lock Screen</strong><br>
+  <img src="assets/lockscreen.jpg" width="480">
+</p>
 
 ---
 
@@ -55,22 +68,21 @@ A clean and modern [Scriptable](https://scriptable.app) widget that shows the re
 
 1. Install the free **[Scriptable](https://apps.apple.com/app/scriptable/id1405459188)** app from the App Store.
 2. Open Scriptable → tap **+** → paste the contents of [`widget.js`](widget.js).
-3. Name the script whatever you like (e.g. “Forex Sessions”).
-4. Long-press your Home Screen → **+** → search for **Scriptable** → add the desired size.
-5. Tap the new widget → select the script you just created.
+3. Name the script (e.g. “Forex Sessions”).
+4. Long-press your Home Screen → **+** → search for **Scriptable** → choose a size.
+5. Tap the widget → select the script you just created.
 
-No parameters or configuration needed. The widget automatically uses your device’s local time zone and appearance setting.
+No parameters needed. The widget automatically uses your device’s local time zone and system appearance (Light/Dark).
 
 ---
 
 ### Preview & Testing
 
-At the top of the script you can change these values for testing:
+You can change these values at the top of the script while testing:
 
 ```js
-// Which size to preview when running inside Scriptable
-const PREVIEW_FAMILY = 'large'; 
-// Options: 'small' | 'medium' | 'large' | 'accessoryRectangular' | 'accessoryCircular' | 'accessoryInline'
+const PREVIEW_FAMILY = 'large';
+// 'small' | 'medium' | 'large' | 'accessoryRectangular' | 'accessoryCircular' | 'accessoryInline'
 
-// Force Light or Dark mode while testing (null = follow system)
-const THEME_OVERRIDE = null; // null | 'light' | 'dark'
+const THEME_OVERRIDE = null;
+// null = follow system | 'light' | 'dark'
