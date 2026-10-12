@@ -84,7 +84,7 @@ const PREVIEW_FAMILY = 'large';
 // 'small' | 'medium' | 'large' | 'accessoryRectangular' | 'accessoryCircular' | 'accessoryInline'
 
 const THEME_OVERRIDE = null;
-// null = follow system | 'light' | 'dark'
+// null = follow system | 'light' | 'dark' 
 ```
 
 ---
