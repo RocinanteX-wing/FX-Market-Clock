@@ -10,27 +10,33 @@ A clean and modern [Scriptable](https://scriptable.app) widget that shows the re
 
 ### Features
 
-- Live open/closed status for all four major FX sessions
-- Next open / close countdown with precise timing
-- Full 24-hour visual schedule in **your local time**
-- Best liquidity hour, quietest hour, and NY “witching” hour
-- Automatic Light / Dark mode support
-- Correctly handles DST, weekends, and major holidays (Christmas, New Year, Good Friday)
-- Works on both Home Screen and Lock Screen widgets
+- Live open/closed status for all four major FX sessions  
+- Next open / close countdown with precise timing  
+- Full 24-hour visual schedule in **your local time**  
+- Best liquidity hour, quietest hour, and NY “witching” hour  
+- Automatic Light / Dark mode support  
+- Correctly handles DST, weekends, and major holidays (Christmas, New Year, Good Friday)  
+- Works on both Home Screen and Lock Screen widgets  
 
 ---
 
 ### Screenshots
 
+<p align="center">
+  <img src="assets/large-mockup.png" width="480" alt="Large Widget">
+</p>
+
+<br>
+
 <table>
   <tr>
     <td align="center" width="50%">
-      <strong>Small</strong><br>
-      <img src="assets/small.jpg" width="220">
+      <img src="assets/small-mockup.png" width="260" alt="Small Widget"><br>
+      <sub><strong>Small</strong></sub>
     </td>
     <td align="center" width="50%">
-      <strong>Medium</strong><br>
-      <img src="assets/medium.jpg" width="320">
+      <img src="assets/medium-mockup.png" width="320" alt="Medium Widget"><br>
+      <sub><strong>Medium</strong></sub>
     </td>
   </tr>
 </table>
@@ -38,15 +44,8 @@ A clean and modern [Scriptable](https://scriptable.app) widget that shows the re
 <br>
 
 <p align="center">
-  <strong>Large</strong><br>
-  <img src="assets/large.jpg" width="420">
-</p>
-
-<br>
-
-<p align="center">
-  <strong>Lock Screen</strong><br>
-  <img src="assets/lockscreen.jpg" width="480">
+  <img src="assets/lockscreen-mockup.png" width="500" alt="Lock Screen Widget"><br>
+  <sub><strong>Lock Screen</strong></sub>
 </p>
 
 ---
