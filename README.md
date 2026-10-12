@@ -80,9 +80,9 @@ At the top of the script you can change:
 
 const PREVIEW\_FAMILY = 'large'; // 'small' | 'medium' | 'large' | 'accessoryRectangular' | ...
 
-Run the script inside the Scriptable app to see a live preview.
+#Run the script inside the Scriptable app to see a live preview.
 
-Theme Override (for testing)
+#Theme Override (for testing)
 
 JavaScript
 const THEME_OVERRIDE = null; // null = system | 'light' | 'dark'
