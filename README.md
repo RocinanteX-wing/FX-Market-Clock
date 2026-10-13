@@ -179,11 +179,10 @@ FX-Market-Clock/
 ├── README.md
 ├── widget.js
 ├── assets/
-│   ├── large-mockup.png
-│   ├── medium-mockup.png
-│   ├── small-mockup.png
-│   └── lockscreen-mockup.png
-└── ...
+    ├── large-mockup.png
+    ├── medium-mockup.png
+    ├── small-mockup.png
+    └── lockscreen-mockup.png
 ```
 
 - `widget.js` — the complete widget implementation
