@@ -55,7 +55,7 @@ The widget is especially useful for:
 <table align="center">
   <tr>
     <td align="center" valign="top">
-      <img src="assets/small-mockup.png" width="220" alt="Small widget preview"><br>
+      <img src="assets/small-mockup.png" width="320" alt="Small widget preview"><br>
       <sub><strong>Small</strong></sub>
     </td>
     <td width="32"></td>
