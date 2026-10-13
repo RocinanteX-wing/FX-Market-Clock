@@ -49,21 +49,24 @@ The widget is especially useful for:
 ## Screenshots
 
 <p align="center">
-  <img src="assets/large-mockup.png" width="480" alt="Large FX Market Clock widget preview">
+  <img src="assets/large-mockup.png" width="560" alt="Large FX Market Clock widget preview">
 </p>
 
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <img src="assets/small-mockup.png" width="260" alt="Small widget preview"><br>
-      <sub><strong>Small</strong></sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="assets/medium-mockup.png" width="320" alt="Medium widget preview"><br>
-      <sub><strong>Medium</strong></sub>
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" valign="top">
+        <img src="assets/small-mockup.png" width="220" alt="Small widget preview"><br>
+        <sub><strong>Small</strong></sub>
+      </td>
+      <td width="24"></td>
+      <td align="center" valign="top">
+        <img src="assets/medium-mockup.png" width="320" alt="Medium widget preview"><br>
+        <sub><strong>Medium</strong></sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 <p align="center">
   <img src="assets/lockscreen-mockup.png" width="500" alt="Lock Screen widget preview"><br>
