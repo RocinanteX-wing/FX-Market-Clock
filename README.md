@@ -178,7 +178,7 @@ FX-Market-Clock/
 ├── LICENSE.txt
 ├── README.md
 ├── widget.js
-├── assets/
+└── assets/
     ├── large-mockup.png
     ├── medium-mockup.png
     ├── small-mockup.png
