@@ -167,7 +167,7 @@ const statusLine = marketClosedWeekend
     ? (sessions.some(s => s.holidayClosed) ? 'Holiday closures in effect' : 'All sessions closed')
     : openSessions.length === 1
       ? `${openSessions[0].name} open`
-      : `${openSessions.map(s => s.name).join(' + ')} overlap`;
+      : `${openSessions.map(s => s.name).join(' + ')} Overlap`;
 
 let boundaryLine = 'Holiday closures in effect';
 let boundaryShort = 'Holiday closures';   // compact form for the small widget
@@ -689,7 +689,7 @@ function buildAccessoryRectangular(w) {
 function buildAccessoryInline(w) {
   // The inline slot is only ~20 characters wide, so overlaps use city codes.
   const short = openSessions.length > 1
-    ? `${openSessions.map(s => s.code).join('+')} overlap`
+    ? `${openSessions.map(s => s.code).join('+')} Overlap`
     : statusLine;
   txt(w, `FX · ${short}`, 12, 'regular', null, { lines: 1, scale: 0.6 });
 }
