@@ -6,9 +6,9 @@
 
 A premium-style Scriptable widget for iOS that tracks the four major foreign exchange sessions in real time: Sydney, Tokyo, London, and New York.
 
-It surfaces the current market state, next open/close event, 24-hour session schedule in local time, and liquidity-focused windows such as the best liquidity period, quietest hour, and the New York “witching” hour.
+It surfaces the current market state, next open/close event, 24-hour session schedule in local time, and liquidity-focused windows such as the best liquidity period, quietest hour, and the New York witching hour. The latest update also adds a dedicated StandBy layout for iPhone charging mode.
 
-This is built for traders, market participants, and anyone who wants a quick read on global FX market activity from their Home Screen or Lock Screen.
+This is built for traders, market participants, and anyone who wants a quick read on global FX market activity from their Home Screen, Lock Screen, or StandBy display.
 
 ---
 
@@ -16,7 +16,7 @@ This is built for traders, market participants, and anyone who wants a quick rea
 
 FX Market Clock is a single-file Scriptable widget designed to run on iPhone and iPad without needing any backend, API key, or server.
 
-Instead of fetching live market data from a remote service, it calculates the current market phase from session timing rules, local time zones, and market calendar logic. That means it remains lightweight, private, and reliable while still capturing the essentials of global FX market behavior.
+Instead of fetching live market data from a remote service, it calculates the current market phase from session timing rules, local time zones, and market calendar logic. That means it remains lightweight, private, and reliable while tracking the real rhythm of the global FX market.
 
 The widget is especially useful for:
 
@@ -25,6 +25,7 @@ The widget is especially useful for:
 - Viewing the full 24-hour schedule in your local time
 - Identifying the strongest or quietest liquidity windows
 - Checking daylight-saving-time-safe session timing on the fly
+- Using a dedicated StandBy layout when your iPhone is charging in landscape
 
 ---
 
@@ -34,6 +35,7 @@ The widget is especially useful for:
 - Countdown to the next session open or close
 - Visual 24-hour market timeline aligned to your device’s local time
 - Best liquidity window, quiet hour, and NY witching-hour markers
+- StandBy-ready black-screen layout optimized for iPhone landscape charging mode
 - Automatic light/dark mode compatibility via the device appearance
 - Correct handling of:
   - daylight saving time
@@ -71,6 +73,11 @@ The widget is especially useful for:
   <sub><strong>Lock Screen</strong></sub>
 </p>
 
+<p align="center">
+  <img src="assets/standby-mockup.png" width="420" alt="StandBy widget preview"><br>
+  <sub><strong>StandBy</strong></sub>
+</p>
+
 ---
 
 ## Supported Widget Sizes
@@ -83,6 +90,7 @@ The widget is especially useful for:
 | Lock Screen – Rectangular | ✅ |
 | Lock Screen – Circular | ✅ |
 | Lock Screen – Inline | ✅ |
+| StandBy (iPhone landscape charging view) | ✅ |
 
 ---
 
@@ -140,12 +148,23 @@ These weights are used to estimate where the market is busiest and quietest over
 1. Install the free [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) app from the App Store.
 2. Open Scriptable.
 3. Tap the `+` button to create a new script.
-4. Paste the full contents of `widget.js` into the editor.
+4. Paste the full contents of `fx-market-clock.js` into the editor.
 5. Save the script with a name such as `FX Market Clock`.
-6. Add a Scriptable widget to your Home Screen or Lock Screen.
-7. Tap the widget and select the script you just created.
+6. Add a Scriptable widget to your Home Screen or Lock Screen and select the script you just created.
+7. Tap the widget and choose the relevant widget size.
 
 No parameters are required under normal use. The script automatically uses the device’s local timezone and system light/dark appearance.
+
+### StandBy setup
+
+The repository also includes a second script, `fx-market-clock-standby.js`, which is optimized for iPhone landscape charging mode.
+
+Use either of the following methods:
+
+- Add the StandBy script as a separate widget and set its widget parameter to `standby`
+- Or use the standalone script copy with `STANDBY_ONLY_SCRIPT = true` for a dedicated StandBy widget
+
+This version uses a black background and high-contrast live countdown so it remains readable in StandBy’s Night Mode.
 
 ---
 
@@ -153,7 +172,7 @@ No parameters are required under normal use. The script automatically uses the d
 
 The script includes a preview mode for testing directly inside Scriptable.
 
-At the top of `widget.js`, you can adjust:
+At the top of `fx-market-clock.js`, you can adjust:
 
 ```js
 const PREVIEW_FAMILY = 'large';
@@ -168,6 +187,7 @@ This is useful when you want to:
 - preview a specific widget size
 - test dark mode and light mode rendering
 - verify layout behavior before placing it on your Home Screen
+- preview the StandBy rendering in the Scriptable editor
 
 ---
 
@@ -177,15 +197,18 @@ This is useful when you want to:
 FX-Market-Clock/
 ├── LICENSE.txt
 ├── README.md
-├── widget.js
+├── fx-market-clock.js
+├── fx-market-clock-standby.js
 └── assets/
     ├── large-mockup.png
     ├── medium-mockup.png
     ├── small-mockup.png
-    └── lockscreen-mockup.png
+    ├── lockscreen-mockup.png
+    └── standby-mockup.png
 ```
 
-- `widget.js` — the complete widget implementation
+- `fx-market-clock.js` — the main widget implementation
+- `fx-market-clock-standby.js` — optional StandBy layout for iPhone landscape charging view
 - `assets/` — mockup images used in the documentation
 - `LICENSE.txt` — project licensing terms
 - `README.md` — usage and project documentation
@@ -194,7 +217,7 @@ FX-Market-Clock/
 
 ## Customization
 
-The widget styling is centralized in the theme block at the top of `widget.js`.
+The widget styling is centralized in the theme block at the top of `fx-market-clock.js`.
 
 You can tailor the appearance by editing the color values defined in `C`:
 
@@ -224,6 +247,7 @@ It gives you a quick, glanceable overview of:
 - where overlap is occurring across trading sessions
 - when the next key event will happen
 - which periods are likely to offer better liquidity conditions
+- how the market looks in a dedicated StandBy reading mode
 
 For many users, this is a more meaningful view than a simple clock because it reflects the actual operational behavior of the FX market across the 24-hour trading cycle.
 
@@ -239,7 +263,7 @@ This project is distributed under the MIT License. See [`LICENSE.txt`](LICENSE.t
 
 This repository is intentionally lightweight and focused. It is designed to be easy to understand, easy to customize, and easy to drop into Scriptable for daily use.
 
-If you want a different visual theme, alternate session definitions, or more explicit trading-day logic, the implementation is already structured so those changes can be made in one place without redesigning the widget.
+If you want a different visual theme, alternate session definitions, or more explicit trading-day logic, the implementation is already structured so those changes can be made in one place without disturbing the rest of the layout.
 
 ---
 
