@@ -23,6 +23,23 @@
 //   (including "Automatic" switching at sunset). To preview one mode while
 //   testing, set THEME_OVERRIDE below to 'light' or 'dark'.
 //
+//  STANDBY (iPhone on its side while charging)
+//   StandBy shows the SMALL widget, scaled up, on a black screen. Scriptable
+//   can't tell whether a widget is in StandBy, so the StandBy layout only
+//   appears where you ask for it, and your Home Screen small widget is never
+//   touched. Two ways, pick one:
+//     1. Same script: edit the StandBy widget and set Parameter to: standby
+//        (a widget with no parameter keeps the normal layout).
+//     2. Separate script: duplicate this script, set STANDBY_ONLY_SCRIPT below
+//        to true in the copy, and choose the copy for your StandBy widget.
+//   The StandBy layout has a black background, a big live countdown, and
+//   open/closed shown by shape (filled dot vs ring) so it still reads in
+//   StandBy's red Night Mode.
+//
+//  NEXT EVENT COUNTDOWN
+//   The "Next" block on the small, medium and large widgets has a live
+//   ticking timer. It's a system timer, so it keeps counting between refreshes.
+//
 //  Running the script inside the Scriptable app shows a preview.
 // ============================================================================
 
@@ -32,6 +49,15 @@ const PREVIEW_FAMILY = 'large';
 
 // null = follow the device | 'light' | 'dark' = force one appearance (testing)
 const THEME_OVERRIDE = null;
+
+// Leave false in your main script. Set true ONLY in a separate copy that you use
+// for your StandBy widget: every small widget running a script with this set to
+// true gets the black StandBy layout.
+const STANDBY_ONLY_SCRIPT = false;
+
+// Preview the StandBy layout when you run the script inside the Scriptable app
+// (also set PREVIEW_FAMILY = 'small'). Has no effect on actual widgets.
+const PREVIEW_STANDBY = false;
 
 // ----------------------------------------------------------------------------
 //  Session model
@@ -73,6 +99,20 @@ function isWeeklyMarketClosed(now) {
   const day = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[p.weekday];
   const hour = +p.hour + (+p.minute) / 60;
   return (day === 5 && hour >= 17) || day === 6 || (day === 0 && hour < 17);
+}
+
+// The exact minute the weekly close lifts (Sunday 17:00 New York). Used for the
+// live countdown. Coarse 30-minute steps, then refined to the minute.
+function weekendReopenDate(from) {
+  const STEP = 30 * 60000;
+  let t = from.getTime();
+  for (let i = 0; i < 110 && isWeeklyMarketClosed(new Date(t)); i++) t += STEP;
+  if (isWeeklyMarketClosed(new Date(t))) return null;
+  for (let k = 1; k <= 30; k++) {
+    const probe = t - STEP + k * 60000;
+    if (probe >= from.getTime() && !isWeeklyMarketClosed(new Date(probe))) return new Date(probe);
+  }
+  return new Date(t);
 }
 
 // Good Friday via the Meeus/Jones/Butcher Easter algorithm.
@@ -171,9 +211,17 @@ const statusLine = marketClosedWeekend
 
 let boundaryLine = 'Holiday closures in effect';
 let boundaryShort = 'Holiday closures';   // compact form for the small widget
+let boundaryDate = null;                  // exact moment of the next open/close
+let boundaryLabel = '';                   // e.g. 'NYC OPENS IN' (StandBy countdown caption)
+let boundaryPrefix = '';                  // e.g. 'Sydney opens in'  (text before the live timer)
+let boundaryPrefixShort = '';             // e.g. 'SYD opens'        (small widget)
 if (marketClosedWeekend) {
   boundaryLine = 'Reopens Sunday 5pm NY time';
   boundaryShort = 'Opens Sun 5pm NY';
+  boundaryDate = weekendReopenDate(now);
+  boundaryLabel = 'REOPENS IN';
+  boundaryPrefix = 'Reopens in';
+  boundaryPrefixShort = 'Reopens';
 } else {
   const nextEvent = sessions
     .filter(s => !s.holidayClosed)
@@ -183,6 +231,10 @@ if (marketClosedWeekend) {
     const verb = nextEvent.s.openNow ? 'closes' : 'opens';
     boundaryLine = `${nextEvent.s.name} ${verb} in ${fmtCountdown(nextEvent.hours)}`;
     boundaryShort = `${nextEvent.s.code} ${verb} ${fmtCountdown(nextEvent.hours)}`;
+    boundaryDate = new Date(now.getTime() + nextEvent.hours * 3600000);
+    boundaryLabel = `${nextEvent.s.code} ${verb.toUpperCase()} IN`;
+    boundaryPrefix = `${nextEvent.s.name} ${verb} in`;
+    boundaryPrefixShort = `${nextEvent.s.code} ${verb}`;
   }
 }
 
@@ -323,6 +375,26 @@ function vstack(parent, spacing = 0) {
   return s;
 }
 
+// Monospaced digits so a ticking timer doesn't jitter. Falls back gracefully.
+function monoFont(size) {
+  const name = ['semiboldMonospacedSystemFont', 'boldMonospacedSystemFont', 'mediumMonospacedSystemFont', 'regularMonospacedSystemFont']
+    .find(n => typeof Font[n] === 'function');
+  return name ? Font[name](size) : Font.semiboldSystemFont(size);
+}
+
+// Live countdown to the next open/close. A system timer: it keeps ticking by
+// itself even when iOS doesn't refresh the widget.
+function liveTimer(parent, size, color, o = {}) {
+  const t = parent.addDate(boundaryDate);
+  t.applyTimerStyle();
+  t.font = monoFont(size);
+  t.textColor = color;
+  t.lineLimit = 1;
+  if (o.scale) t.minimumScaleFactor = o.scale;
+  t.leftAlignText();
+  return t;
+}
+
 // Fixed-size empty block. Unlike addSpacer(), which iOS never lets shrink below
 // roughly 8pt, this takes exactly the room asked for. Use it in tight rows.
 function blank(parent, w, h = 1) {
@@ -424,13 +496,88 @@ function buildSmall(w, SZ) {
   panel.borderColor = C.line;
   panel.borderWidth = 1;
   panel.cornerRadius = 9;
-  panel.setPadding(5, 7, 5, 7);
+  panel.setPadding(5, 6, 5, 6);
   panel.size = new Size(innerW, 0);
-  const nextLabel = hstack(panel);
-  nextLabel.size = new Size(22, 0);
-  txt(nextLabel, 'NEXT', 8, 'bold', C.accent, { lines: 1, scale: 0.8 });
-  txt(panel, boundaryShort, 9, 'medium', C.inkSoft, { lines: 1, scale: 0.75 });
+  if (boundaryDate) {
+    // "SYD opens" in the accent color plays the part of the NEXT tag, which
+    // leaves room for a live timer on a 158pt-wide widget.
+    txt(panel, boundaryPrefixShort, 8.5, 'bold', C.accent, { lines: 1, scale: 0.75 });
+    liveTimer(panel, 9.5, C.ink, { scale: 0.75 });
+  } else {
+    const nextLabel = hstack(panel);
+    nextLabel.size = new Size(22, 0);
+    txt(nextLabel, 'NEXT', 8, 'bold', C.accent, { lines: 1, scale: 0.8 });
+    txt(panel, boundaryShort, 9, 'medium', C.inkSoft, { lines: 1, scale: 0.75 });
+  }
   panel.addSpacer();
+}
+
+// ----------------------------------------------------------------------------
+//  STANDBY (small widget on a black screen, built to be read from across a room)
+// ----------------------------------------------------------------------------
+// StandBy is always a black screen, so this layout uses fixed dark colors
+// instead of the Light/Dark pairs. In Night Mode iOS recolors everything red,
+// so meaning is carried by brightness and shape, not by hue.
+const SB = {
+  bg:     new Color('#000000'),
+  ink:    new Color('#F2EFE6'),   // open sessions, hero text
+  muted:  new Color('#A0A59F'),   // captions
+  faint:  new Color('#6D726D'),   // closed sessions
+  accent: new Color('#D4A961'),   // "live" caption, open dot
+};
+
+// Hollow circle, used for "closed" so the state doesn't depend on color.
+function ring(parent, color, d = 6, borderW = 1.3) {
+  const s = parent.addStack();
+  s.size = new Size(d, d);
+  s.cornerRadius = d / 2;
+  s.borderColor = color;
+  s.borderWidth = borderW;
+  return s;
+}
+
+function buildStandBy(w, SZ) {
+  const innerW = SZ.w - 28;
+  w.setPadding(14, 14, 14, 14);
+  const focus = openSessions[0];
+
+  // Caption: what state the market is in.
+  const caption = marketClosedWeekend ? 'MARKET CLOSED'
+    : openSessions.length > 1 ? 'LIVE OVERLAP'
+    : focus ? 'LIVE SESSION' : 'MARKET STATUS';
+  txt(w, caption, 9, 'bold', focus ? SB.accent : SB.muted, { lines: 1 });
+  w.addSpacer(2);
+
+  // Hero: the open session(s), or why the market is shut.
+  const hero = marketClosedWeekend ? 'Weekend'
+    : openSessions.length > 1 ? openSessions.map(s => s.code).join(' + ')
+    : focus ? focus.name
+    : sessions.some(s => s.holidayClosed) ? 'Holiday' : 'Closed';
+  txt(w, hero, 28, 'semibold', SB.ink, { lines: 1, scale: 0.55 });
+
+  w.addSpacer(); // the one flexible gap
+
+  // Live countdown. This is a system timer, so it keeps ticking by itself even
+  // when iOS doesn't refresh the widget, which a typed-out "1h 03m" can't do.
+  if (boundaryDate) {
+    txt(w, boundaryLabel, 8.5, 'bold', SB.muted, { lines: 1 });
+    w.addSpacer(1);
+    liveTimer(w, 25, SB.ink, { scale: 0.6 });
+  } else {
+    txt(w, boundaryShort, 13, 'semibold', SB.ink, { lines: 1, scale: 0.7 });
+  }
+  w.addSpacer(9);
+
+  // Sessions: filled dot + bright text = open, ring + dim text = closed.
+  const codeSize = innerW >= 126 ? 9 : 8; // narrower phones: slightly smaller codes
+  const cellEst = innerW >= 126 ? 28.5 : 26.5;
+  const gapW = Math.max(3, Math.min(8, Math.floor((innerW - 4 * cellEst) / 3)));
+  const row = hstack(w, gapW);
+  sessions.forEach(s => {
+    const cell = hstack(row, 3.5);
+    if (s.openNow) dot(cell, SB.accent, 6); else ring(cell, SB.faint, 6);
+    txt(cell, s.code, codeSize, 'bold', s.openNow ? SB.ink : SB.faint, { lines: 1 });
+  });
 }
 
 // ----------------------------------------------------------------------------
@@ -454,7 +601,7 @@ function buildMedium(w, SZ) {
   left.size = new Size(leftW, contentH);
   txt(left, 'FOREX · SESSION BOARD', 7.5, 'bold', C.muted, { lines: 1, scale: 0.7 });
   left.addSpacer(7);
-  txt(left, statusLine, 15, 'semibold', C.ink, { lines: 3, scale: 0.7 });
+  txt(left, statusLine, 15, 'semibold', C.ink, { lines: 2, scale: 0.7 });
   left.addSpacer(4);
   txt(left, `${asOfText} · Local time`, 8.5, 'regular', C.muted, { lines: 1, scale: 0.7 });
   left.addSpacer();
@@ -462,7 +609,13 @@ function buildMedium(w, SZ) {
   left.addSpacer(7);
   txt(left, 'NEXT EVENT', 7, 'bold', C.muted, { lines: 1 });
   left.addSpacer(3);
-  txt(left, boundaryLine, 9.5, 'medium', C.inkSoft, { lines: 2, scale: 0.8 });
+  if (boundaryDate) {
+    txt(left, boundaryPrefix, 9.5, 'medium', C.inkSoft, { lines: 1, scale: 0.8 });
+    left.addSpacer(1);
+    liveTimer(left, 16, C.ink, { scale: 0.6 });
+  } else {
+    txt(left, boundaryLine, 9.5, 'medium', C.inkSoft, { lines: 2, scale: 0.8 });
+  }
 
   blank(outer, gutter, 1);
   const divider = outer.addStack();
@@ -564,7 +717,13 @@ function buildLarge(w, SZ) {
   const nextText = vstack(next, 2);
   nextText.size = new Size(contentW - 22 - asOfW, 0);
   txt(nextText, 'NEXT MARKET EVENT', 7.5, 'bold', C.muted, { lines: 1 });
-  txt(nextText, boundaryLine, 12.5, 'semibold', C.ink, { lines: 1, scale: 0.7 });
+  if (boundaryDate) {
+    const line = hstack(nextText, 5);
+    txt(line, boundaryPrefix, 12.5, 'semibold', C.ink, { lines: 1, scale: 0.7 });
+    liveTimer(line, 12.5, C.ink, { scale: 0.7 });
+  } else {
+    txt(nextText, boundaryLine, 12.5, 'semibold', C.ink, { lines: 1, scale: 0.7 });
+  }
   if (!tight) {
     const asOf = vstack(next, 1);
     asOf.size = new Size(asOfW, 0);
@@ -687,7 +846,7 @@ function buildAccessoryRectangular(w) {
 }
 
 function buildAccessoryInline(w) {
-  // The inline slot is only ~20 characters wide, so overlaps use city codes.
+  // The inline slot is only ~20 characters wide, so Overlaps use city codes.
   const short = openSessions.length > 1
     ? `${openSessions.map(s => s.code).join('+')} Overlap`
     : statusLine;
@@ -707,13 +866,16 @@ function buildAccessoryCircular(w) {
 const family = config.widgetFamily || PREVIEW_FAMILY;
 const isAccessory = family.startsWith('accessory');
 const SZ = widgetPoints(family);
+const widgetParam = String((typeof args !== 'undefined' && args.widgetParameter) || '').trim().toLowerCase();
+const useStandBy = family === 'small' &&
+  (STANDBY_ONLY_SCRIPT || widgetParam === 'standby' || (!config.runsInWidget && PREVIEW_STANDBY));
 
 const widget = new ListWidget();
 widget.spacing = 0;
 if (isAccessory) {
   widget.useDefaultPadding();
 } else {
-  widget.backgroundColor = C.surface;
+  widget.backgroundColor = useStandBy ? SB.bg : C.surface;
 }
 
 switch (family) {
@@ -722,11 +884,16 @@ switch (family) {
   case 'accessoryRectangular': buildAccessoryRectangular(widget); break;
   case 'accessoryInline':      buildAccessoryInline(widget); break;
   case 'accessoryCircular':    buildAccessoryCircular(widget); break;
-  default:                     buildSmall(widget, SZ);
+  default:                     useStandBy ? buildStandBy(widget, SZ) : buildSmall(widget, SZ);
 }
 
-// Ask iOS to refresh about every minute (iOS decides the real cadence).
-widget.refreshAfterDate = new Date(Date.now() + 60 * 1000);
+// Ask iOS to refresh about every minute, and again right when the next session
+// opens or closes (iOS decides the real cadence).
+const nextRefresh = Math.min(
+  Date.now() + 60 * 1000,
+  boundaryDate ? boundaryDate.getTime() + 1000 : Infinity
+);
+widget.refreshAfterDate = new Date(Math.max(nextRefresh, Date.now() + 5000));
 
 if (config.runsInWidget) {
   Script.setWidget(widget);
