@@ -6,17 +6,19 @@
 
 A premium-style Scriptable widget for iOS that tracks the four major foreign exchange sessions in real time: Sydney, Tokyo, London, and New York.
 
-It surfaces the current market state, next open/close event, 24-hour session schedule in local time, and liquidity-focused windows such as the best liquidity period, quietest hour, and the New York witching hour. The latest update also adds a dedicated StandBy layout for iPhone charging mode.
+It surfaces the current market state, next open/close event, 24-hour session schedule in local time, and liquidity-focused windows such as the best liquidity period, quietest hour, and the New York witching hour.
 
 This is built for traders, market participants, and anyone who wants a quick read on global FX market activity from their Home Screen, Lock Screen, or StandBy display.
+
+It also includes a dedicated StandBy layout for iPhone charging mode.
 
 ---
 
 ## Overview
 
-FX Market Clock is a single-file Scriptable widget designed to run on iPhone and iPad without needing any backend, API key, or server.
+FX Market Clock is a single self-contained Scriptable widget file with no backend, API key, or server, plus an optional second file for StandBy.
 
-Instead of fetching live market data from a remote service, it calculates the current market phase from session timing rules, local time zones, and market calendar logic. That means it remains lightweight, private, and reliable while tracking the real rhythm of the global FX market.
+Instead of fetching live market data from a remote service, it calculates the current market phase from session timing rules, local time zones, and market calendar logic. That means it remains lightweight and dependable while still capturing the essentials of global FX market behavior.
 
 The widget is especially useful for:
 
@@ -32,7 +34,7 @@ The widget is especially useful for:
 ## Features
 
 - Live detection of open and closed status for Sydney, Tokyo, London, and New York
-- Countdown to the next session open or close
+- Countdown to the next session open or close, as a live ticking timer that keeps counting between refreshes
 - Visual 24-hour market timeline aligned to your device’s local time
 - Best liquidity window, quiet hour, and NY witching-hour markers
 - StandBy-ready black-screen layout optimized for iPhone landscape charging mode
@@ -44,7 +46,7 @@ The widget is especially useful for:
   - Good Friday for London and Sydney trading sessions
 - Works across Home Screen and Lock Screen widget sizes
 - No configuration required for normal use
-- Fully self-contained in a single JavaScript file
+- Main widget is one self-contained file with no backend or API key, plus an optional second file for StandBy
 
 ---
 
@@ -150,21 +152,23 @@ These weights are used to estimate where the market is busiest and quietest over
 3. Tap the `+` button to create a new script.
 4. Paste the full contents of `fx-market-clock.js` into the editor.
 5. Save the script with a name such as `FX Market Clock`.
-6. Add a Scriptable widget to your Home Screen or Lock Screen and select the script you just created.
-7. Tap the widget and choose the relevant widget size.
+6. Add a Scriptable widget to your Home Screen or Lock Screen (the size is chosen when adding it).
+7. Tap the widget and select the script you created.
 
 No parameters are required under normal use. The script automatically uses the device’s local timezone and system light/dark appearance.
 
 ### StandBy setup
 
-The repository also includes a second script, `fx-market-clock-standby.js`, which is optimized for iPhone landscape charging mode.
+StandBy (iPhone on its side while charging) shows the small widget, scaled up, on a black screen. Scriptable cannot detect StandBy, so the StandBy layout only appears when you ask for it, and your normal Home Screen small widget is never affected.
 
-Use either of the following methods:
+Use either of these methods:
 
-- Add the StandBy script as a separate widget and set its widget parameter to `standby`
-- Or use the standalone script copy with `STANDBY_ONLY_SCRIPT = true` for a dedicated StandBy widget
+- Same script: in the StandBy widget, choose `fx-market-clock.js` and set the widget Parameter to `standby`.
+- Separate script: paste `fx-market-clock-standby.js` into a new Scriptable script (for example, "FX Market Clock StandBy") and choose it for the StandBy widget. No parameter is needed, because it has `STANDBY_ONLY_SCRIPT = true`.
 
-This version uses a black background and high-contrast live countdown so it remains readable in StandBy’s Night Mode.
+Never set `STANDBY_ONLY_SCRIPT = true` in the main script, because every small widget using that script would then show the StandBy layout.
+
+This layout has a black background and a large live countdown, and shows open/closed status by shape (filled dot vs. ring) so it stays readable in StandBy’s red Night Mode.
 
 ---
 
@@ -177,6 +181,12 @@ At the top of `fx-market-clock.js`, you can adjust:
 ```js
 const PREVIEW_FAMILY = 'large';
 // 'small' | 'medium' | 'large' | 'accessoryRectangular' | 'accessoryCircular' | 'accessoryInline'
+
+const STANDBY_ONLY_SCRIPT = false;
+// true only in a separate copy used for StandBy
+
+const PREVIEW_STANDBY = false;
+// preview the StandBy layout inside Scriptable; set PREVIEW_FAMILY = 'small'; no effect on real widgets
 
 const THEME_OVERRIDE = null;
 // null = follow system | 'light' | 'dark'
@@ -261,9 +271,9 @@ This project is distributed under the MIT License. See [`LICENSE.txt`](LICENSE.t
 
 ## Notes
 
-This repository is intentionally lightweight and focused. It is designed to be easy to understand, easy to customize, and easy to drop into Scriptable for daily use.
+This repository is intentionally lightweight and focused. It is designed to be easy to understand, easy to customize, and easy to drop into Scriptable for daily use without redesigning the widget.
 
-If you want a different visual theme, alternate session definitions, or more explicit trading-day logic, the implementation is already structured so those changes can be made in one place without disturbing the rest of the layout.
+If you want a different visual theme, alternate session definitions, or more explicit trading-day logic, the implementation is already structured so those changes can be made in one place without redesigning the widget.
 
 ---
 
